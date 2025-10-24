@@ -1,0 +1,257 @@
+<!-- Untuk menandakan dokumen dengan type data HTML -->
+<!doctype html>
+<!-- Untuk membuka HTML dan menunjukkan bahasa konten dengan Bahasa Indonesia -->
+<html lang="id">
+<!-- Mengatur sistem penulisan, agar teks ditampilkan dengan benar -->
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard Statistik Geospasial Kabupaten Kaur 2024</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+/* aturan CSS untuk mengatur seluruh tampilan halaman dengan menghapus margin default, serta mengatur font, warna teks, dan warna latar belakang */
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f8f4ef;
+      margin: 0;
+      color: #4b3f2f;
+    }
+/* HEADER/Judul Halaman = untuk membuat dan mengatur judul diatas halaman*/
+    .topbar {
+      background: linear-gradient(90deg, #e3d4b3, #d6c6a8);
+      color: #3a3224;
+      text-align: center;
+      padding: 22px 10px;
+      font-size: 22px;
+      font-weight: 600;
+      border-bottom: 4px solid #c7b692;
+      text-shadow: 0 1px 1px rgba(255,255,255,0.4);
+    }
+/* Container Utama = untuk mengumpulkan seluruh isi elemen agar lebih rapi*/
+    .container {
+      max-width: 1200px;
+      margin: 24px auto;
+      background: #fffaf0;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+/* HEADER ISI = untuk mengatur tampilan judul dari konten utama halaman */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #e5dcc6;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+/* Untuk mengatur tampilan teks di dalam header, yaitu judul utama <h1>, subjudul <h2>, dan keterangan tambahan .meta */
+    h1 { margin: 0; font-size: 20px; color: #5a4c34; }
+    h2 { margin: 0; font-size: 13px; color: #7a6d54; font-weight: 600; }
+    .meta { font-size: 13px; color: #6a5c3d; margin: 12px 0; }
+
+/* GRID UTAMA = untuk menyusun tata letak peta dan tabel data*/
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 24px;
+      align-items: start;
+    }
+ /* PANEL PETA = untuk menampilkan peta dan judul Peta Kabupaten Kaur */
+    .map {
+      background: linear-gradient(180deg, #fffaf2, #f4ebd8);
+      border: 1px solid #e2d4b6;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .map-title {
+      background: #e8d8b8;
+      color: #463b25;
+      font-weight: 600;
+      font-size: 14px;
+      text-align: center;
+      padding: 6px 0;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
+    }
+/* untuk membatasi ukuran peta agar tidak terlalu besar*/
+    .map img {
+      width: 85%;
+      height: auto;
+      max-height: 330px;
+      object-fit: contain;
+      border-radius: 6px;
+      border: 1px solid #d9c9a5;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+/* untuk menampilkan teks sumber peta dengan ukuran yang kecil dan miring */
+    .map-caption {
+      font-size: 12px;
+      color: #7a6e55;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+/* GRAFIK BATANG = untuk menampilkan grafik dibawah peta */
+    .chart-container {
+      margin-top: 16px;
+      background: #fffaf4;
+      border-radius: 6px;
+      padding: 10px;
+      border: 1px solid #e5d7b8;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    }
+/* untuk memberi judul grafik dengan ukuran kecil dan huruf tebal */
+    .chart-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #5a4c34;
+      margin-bottom: 8px;
+    }
+
+/* PANEL DATA = untuk membuat panel data memiliki warna lembut dengan garis tebal*/
+    .data {
+      background: #fffaf0;
+    }
+    h3 {
+      color: #5a4c34;
+      border-left: 4px solid #d6c6a8;
+      padding-left: 8px;
+    }
+/* untuk mengatur tabel dan header tabel */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    thead th {
+      background: #f1e6cb;
+      padding: 8px;
+      border: 1px solid #e5d7b8;
+      text-align: left;
+    }
+/* untuk mengatur isi tabel dengan padding seimbang serta warna latar selang-seling untuk membedakan tiap baris */
+    tbody td {
+      padding: 8px;
+      border-bottom: 1px dashed #e5decf;
+    }
+    tbody tr:nth-child(even) { background: #fff9ee; }
+/* untuk menonjolkan baris total dengan huruf tebal, serta teks keterangan kecil di bawah tabel */
+    .totals { font-weight: 700; background: #f8edce; }
+    .caption { font-size: 12px; color: #6d5f43; margin-top: 8px; }
+
+/* RESPONSIF = untuk mengatur agar tampilan tetap rapi dengan mengubah tata letak menjadi satu kolom dan memperbesar lebar gambar peta secara otomatis*/
+    @media (max-width: 900px) {
+      .main { grid-template-columns: 1fr; }
+      .map { order: -1; }
+      .map img { width: 100%; max-height: none; }
+    }
+  </style>
+</head>
+<!-- memuat seluruh isi halaman yang dimulai dari elemen topbar dengan menampilkan judul besar Dashboard Statistik Geospasial Kabupaten Kaur Tahun 2024 -->
+<body>
+  <div class="topbar">
+    Dashboard Statistik Geospasial Kabupaten Kaur Tahun 2024
+  </div>
+<!-- untuk menyusun bagian header yang berisi judul halaman dan sumber data resmi dari BPS Kabupaten Kaur -->
+  <div class="container">
+    <header>
+      <div>
+        <h1>Data Statistik Kabupaten Kaur 2024</h1>
+        <h2>Sumber: BPS Kabupaten Kaur — <em>Kabupaten Kaur Dalam Angka 2024</em></h2>
+      </div>
+    </header>
+<!-- memberi deskripsi singkat mengenai isi dan sumber data yang ditampilkan dalam dashboard -->
+    <div class="meta">
+      Berikut adalah data resmi BPS Kabupaten Kaur tahun 2024 yang memuat luas wilayah, jumlah penduduk, dan kepadatan penduduk per kecamatan.
+      Data bersumber dari publikasi <em>Kabupaten Kaur Dalam Angka 2024</em> (Badan Pusat Statistik Kabupaten Kaur).
+    </div>
+<!-- menjadi wadah utama yang berisi panel peta di bagian kiri dan panel data di bagian kanan-->
+    <div class="main">
+<!-- PANEL PETA = untuk menampilkan judul peta, gambar peta administrasi Kabupaten Kaur, keterangan sumber -->
+     <div class="map">
+        <div class="map-title">Peta Administrasi Kabupaten Kaur</div>
+        <img src="https://petatematikindo.files.wordpress.com/2014/09/administrasi-kaur-a1.jpg" alt="Peta Administrasi Kabupaten Kaur">
+        <div class="map-caption">Sumber: Peta Tematik Indonesia (2014)</div>
+<!-- untuk menampilkan grafik batang kepadatan penduduk per kecamatan menggunakan elemen <canvas> -->
+        <div class="chart-container">
+          <div class="chart-title">Grafik Kepadatan Penduduk per Kecamatan (jiwa/km²)</div>
+          <canvas id="chartKepadatan"></canvas>
+        </div>
+      </div>
+
+<!-- untuk menampilkan tabel berisis data luas wilayah, jumlah penduduk, dan kepadatan penduduk per kecamatan serta total keseluruhan kabupaten -->
+      <div class="data">
+        <h3>Data Per Kecamatan – Kabupaten Kaur (2024)</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Kecamatan</th>
+              <th>Luas (km²)</th>
+              <th>Penduduk (jiwa)</th>
+              <th>Kepadatan (jiwa/km²)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>Nasal</td><td>519.92</td><td>16,891</td><td>32</td></tr>
+            <tr><td>2</td><td>Maje</td><td>361.04</td><td>14,753</td><td>41</td></tr>
+            <tr><td>3</td><td>Kaur Selatan</td><td>92.75</td><td>17,425</td><td>188</td></tr>
+            <tr><td>4</td><td>Tetap</td><td>87.92</td><td>7,160</td><td>81</td></tr>
+            <tr><td>5</td><td>Kaur Tengah</td><td>26.40</td><td>5,213</td><td>197</td></tr>
+            <tr><td>6</td><td>Luas</td><td>124.88</td><td>5,825</td><td>47</td></tr>
+            <tr><td>7</td><td>Muara Sahung</td><td>256.00</td><td>7,019</td><td>27</td></tr>
+            <tr><td>8</td><td>Kinal</td><td>154.03</td><td>4,973</td><td>32</td></tr>
+            <tr><td>9</td><td>Semidang Gumay</td><td>64.91</td><td>6,828</td><td>105</td></tr>
+            <tr><td>10</td><td>Tanjung Kemuning</td><td>72.91</td><td>14,228</td><td>195</td></tr>
+            <tr><td>11</td><td>Kelam Tengah</td><td>35.84</td><td>7,414</td><td>207</td></tr>
+            <tr><td>12</td><td>Kaur Utara</td><td>49.80</td><td>7,911</td><td>159</td></tr>
+            <tr><td>13</td><td>Padang Guci Hilir</td><td>115.96</td><td>3,874</td><td>33</td></tr>
+            <tr><td>14</td><td>Lungkang Kule</td><td>32.00</td><td>3,518</td><td>110</td></tr>
+            <tr><td>15</td><td>Padang Guci Hulu</td><td>370.64</td><td>8,031</td><td>22</td></tr>
+            <tr class="totals">
+              <td colspan="2">Total Kabupaten Kaur</td>
+              <td>2,365.00</td>
+              <td>131,063</td>
+              <td>56 (rata-rata)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<!-- untuk memanggil elemen <canvas> dengan ID chartKepadatan, lalu membuat grafik batang berdasarkan data kepadatan dari setiap kecamatan-->
+  <script>
+    const ctx = document.getElementById('chartKepadatan');
+/* untuk menentukan jenis grafik, label kecamatan, nilai kepadatan, warna batang, serta pengaturan sumbu dan tampilan grafik agar mudah dibaca */
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Nasal','Maje','Kaur Selatan','Tetap','Kaur Tengah','Luas','Muara Sahung','Kinal','Semidang Gumay','Tanjung Kemuning','Kelam Tengah','Kaur Utara','Padang Guci Hilir','Lungkang Kule','Padang Guci Hulu'],
+        datasets: [{
+          label: 'Kepadatan (jiwa/km²)',
+          data: [32,41,188,81,197,47,27,32,105,195,207,159,33,110,22],
+          backgroundColor: 'rgba(212, 186, 137, 0.85)',
+          borderColor: '#b89f72',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: 'Jiwa per km²', color: '#5a4c34' } },
+          x: { ticks: { font: { size: 10 }, color: '#5a4c34' } }
+        },
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+  </script>
+<!-- menandai akhir dari struktur halaman web yang berfungsi menampilkan dashboard statistika geospasial Kabupaten Kaur Tahun 2024 -->
+</body>
+</html>
